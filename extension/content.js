@@ -3,10 +3,12 @@
 
   const webExtension = globalThis.browser ?? globalThis.chrome;
   const diffModel = globalThis.WikipaidiaDiff;
+  const sourceLocator = globalThis.WikipaidiaSource;
   if (!webExtension?.runtime?.sendMessage || !diffModel) return;
   if (location.hostname !== "en.wikipedia.org" || !document.body?.classList.contains("ns-0")) return;
   const currentUrl = new URL(location.href);
   if ((currentUrl.searchParams.get("action") || "view") !== "view" || currentUrl.searchParams.has("veaction") || currentUrl.searchParams.has("diff")) return;
+  if (sourceLocator?.isSourceView?.()) return;
   if (document.getElementById("wikipaidia-extension-root")) return;
 
   function titleFromUrl(url) {
@@ -77,6 +79,8 @@
     .source { font-size:12px; color:#36c; text-decoration:underline; text-underline-offset:2px; }
     .card-sources { display:flex; flex-wrap:wrap; gap:5px 10px; font-size:11px; }
     .card-sources .source { font-size:11px; }
+    .evidence-source-entry { flex-basis:100%; }
+    .evidence-source-date { margin-top:2px; color:#72777d; font-size:10px; }
     .article-edits { margin-top:10px; }
     .article-edits .action { font-size:11px; min-height:28px; }
     .article-edits .see-edits { margin-top:12px; }
@@ -662,6 +666,16 @@
     return row;
   }
 
+  function evidenceSourceLabel(item) {
+    const description = item.kind === "paid-disclosure" ? "disclosure"
+      : item.kind === "paid-notice" ? "paid-content notice"
+      : item.kind === "concern" ? "concern"
+      : item.kind === "coi" && item.coiType === "edit-request-group" ? "edit requests"
+      : item.kind === "coi" && item.coiType === "edit-request" ? "edit request"
+      : item.kind === "coi" ? "COI notice" : "evidence";
+    return `View ${item.sourceRole === "archive" ? "archived " : ""}${description} on ${item.sourceTitle || "Wikipedia"}`;
+  }
+
   function evidenceCard(item) {
     const card = el("details", "card");
     card.open = true;
@@ -722,16 +736,21 @@
       }
     }
     const sources = el("div", "card-sources");
-    const source = sourceLink(item.sourceRevision ? `Source revision ${item.sourceRevision}` : `Source: ${item.sourceTitle || "Wikipedia"}`, item.sourceUrl);
+    const sourceUrl = sourceLocator?.buildUrl({ ...item, articles: [result?.title || title] }) || item.sourceUrl;
+    const source = sourceLink(evidenceSourceLabel(item), sourceUrl);
     if (source) {
+      source.classList.add("evidence-source");
       const date = formatDate(item.sourceTimestamp);
-      source.title = `${item.sourceTitle || "Wikipedia"}${date ? ` · Source page updated ${date}` : ""}`;
-      sources.append(source);
+      source.title = `${item.sourceTitle || "Wikipedia"}${item.sourceRevision ? ` · Revision ${item.sourceRevision}` : ""}${date ? ` · Source page updated ${date}` : ""}`;
+      const entry = el("div", "evidence-source-entry");
+      entry.append(source);
+      if (date) entry.append(el("p", "evidence-source-date", `Source page updated ${date}`));
+      sources.append(entry);
     }
     if (Array.isArray(item.disclosureLinks)) {
       for (const value of item.disclosureLinks) {
         const link = sourceLink(value.label || "Disclosure", value.url);
-        if (link && link.href !== source?.href && link.href !== editorUrl) sources.append(link);
+        if (link && link.href !== source?.href && link.href !== safeSource(item.sourceUrl) && link.href !== editorUrl) sources.append(link);
       }
     }
     if (sources.childElementCount) body.append(sources);

@@ -436,6 +436,7 @@ export function analyzePage({ title, wikitext, revid, timestamp, role, articleTi
       sourceRevision: revid || null,
       sourceTimestamp: timestamp || null,
       sourceRole: role,
+      sourceTemplate: parseTemplate(node).name,
       excerpt: boundedExcerpt(node.raw.replace(/\s+/g, " ")),
       ...item,
     });

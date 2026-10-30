@@ -126,7 +126,7 @@ test("empty evidence and single COI requests retain their meaning", () => {
   assert.deepEqual(groupCoiRequests([]), []);
   const single = request("one");
   assert.deepEqual(groupCoiRequests([single]), [single]);
-  assert.equal(SCAN_VERSION, 6, "older cached cards must be rescanned with contextual evidence");
+  assert.equal(SCAN_VERSION, 7, "older cached cards must be rescanned with source locator metadata");
 });
 
 test("deep scan source failures retain basic evidence and mark check incomplete", async () => {

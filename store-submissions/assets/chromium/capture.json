@@ -1,0 +1,21 @@
+{
+  "extensionVersion": "0.11.0",
+  "renderingEngine": "chromium",
+  "browserVersion": "156.0.8078.4",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "fictionalExampleData": true,
+  "requestsToWikipedia": false,
+  "sourceSHA256": {
+    "source-locator.js": "45a83216d74ac408456a0a9bf5a21662ce4e1139e7e987b72c7bf5f64637d549",
+    "diff-model.js": "39b9c5b852c448c9459a742306c3f6386c44321703dff30ab99a5f04bbf28215",
+    "content.js": "2cf51709a77a12ee268836dfca48594d0fe26b72affad96b8c02ac6e7aeb2a63"
+  },
+  "screenshots": [
+    "01-banner.png",
+    "02-evidence-and-edits.png",
+    "03-page-tint.png"
+  ]
+}

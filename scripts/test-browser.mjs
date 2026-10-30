@@ -8,6 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const chromePath = process.env.WIKIPAIDIA_CHROME_PATH;
 const source = await readFile(path.join(root, "extension/content.js"), "utf8");
 const diffModel = await readFile(path.join(root, "extension/diff-model.js"), "utf8");
+const sourceLocator = await readFile(path.join(root, "extension/source-locator.js"), "utf8");
 const engineName = process.argv[2] || process.env.WIKIPAIDIA_BROWSER || "chromium";
 if (process.argv.length > 3 || !["chromium", "chrome", "msedge", "webkit"].includes(engineName)) {
   throw new Error("Usage: node scripts/test-browser.mjs [chromium|chrome|msedge|webkit]; WIKIPAIDIA_BROWSER accepts the same values.");
@@ -22,7 +23,8 @@ const paidEvidence = {
   sourceTitle: "Talk:Fixture Corporation",
   sourceUrl: "https://en.wikipedia.org/w/index.php?title=Talk%3AFixture_Corporation&oldid=12345",
   sourceRevision: 12345, sourceTimestamp: "2026-10-01T12:00:00Z",
-  contributor: "FixtureEditor", employer: "Fixture Corporation", relationship: "page-notice"
+  contributor: "FixtureEditor", employer: "Fixture Corporation", relationship: "page-notice",
+  template: "connected contributor (paid)", sourceTemplate: "connected contributor (paid)"
 };
 const success = result => ({ ok: true, result });
 function scanResult(evidence = [], additions = {}) {
@@ -114,9 +116,63 @@ async function makePage(browser, {
     };
   }, { responses, runtime, responseDelay, messageResponses, messageDelays, heldMessages });
   await page.goto(url);
+  await page.addScriptTag({ content: sourceLocator });
   await page.addScriptTag({ content: diffModel });
   await page.addScriptTag({ content: source });
   return { page, context };
+}
+
+async function assertSourceDestination(link, item, { requireMarker = true, article = "Fixture Corporation" } = {}) {
+  const actual = new URL(await link.getAttribute("href"));
+  const original = new URL(item.sourceUrl);
+  const hash = actual.hash;
+  actual.hash = "";
+  original.hash = "";
+  assert.equal(actual.href, original.href, "Source navigation must preserve the source page and exact revision query.");
+  if (!requireMarker && !hash.startsWith("#wikipaidia-source=")) return;
+  assert.match(hash, /^#wikipaidia-source=/);
+  const target = JSON.parse(decodeURIComponent(hash.slice("#wikipaidia-source=".length)));
+  assert.equal(target.v, 1);
+  assert.equal(target.page, item.sourceTitle);
+  assert.equal(target.rev, item.sourceRevision);
+  assert.equal(target.kind, item.kind);
+  assert.equal(target.editor, item.contributor || "");
+  assert.equal(target.template, item.sourceTemplate || item.template || "");
+  assert.equal(target.article, article);
+  return target;
+}
+
+function talkSourceDocument() {
+  const metadata = {parts:[{template:{target:{wt:"Connected contributor (paid)",href:"./Template:Connected_contributor_(paid)"},
+    params:{User1:{wt:"Fixture EditorTwo"},User2:{wt:"Fixture Editor"},"U2-employer":{wt:"Fixture Corporation"}},i:0}}]};
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><base href="https://en.wikipedia.org/wiki/"><link rel="canonical" href="https://en.wikipedia.org/wiki/Talk:Fixture_Corporation"><style>body{font:16px Arial;margin:30px}li{margin:12px 0}.tmbox{border:1px solid #aaa;padding:20px;width:90%}</style></head><body class="ns-1 action-view"><h1 id="firstHeading">Talk:Fixture Corporation</h1><div id="mw-content-text"><div class="mw-parser-output"><ul><li id="discussion-distractor"><a href="./User:Fixture_Editor" title="User:Fixture Editor">Fixture Editor</a> participated in this unrelated discussion.</li></ul><div style="height:1800px"></div><h2 id="Previous_notice">Paid disclosure</h2><span class="mw-empty-elt" about="#mwt33" typeof="mw:Transclusion" data-mw='${JSON.stringify(metadata)}'></span><table class="plainlinks tmbox tmbox-notice" role="presentation" about="#mwt33"><tbody><tr><td class="mbox-text">The Wikimedia Foundation requires paid contributors to disclose their employer; see <a href="/wiki/Wikipedia:PAID">WP:PAID</a>.<ul><li id="other-editor"><a href="./User:Fixture_EditorTwo" title="User:Fixture EditorTwo">Fixture EditorTwo</a> has been paid by Other Corporation.</li><li id="matching-editor"><a href="./User:Fixture_Editor" title="User:Fixture Editor">Fixture<span typeof="mw:Entity">&nbsp;</span>Editor</a> has been paid by Fixture Corporation.</li></ul></td></tr></tbody></table><div style="height:1000px"></div></div></div></body></html>`;
+}
+
+function userSourceDocument() {
+  const notice=(about,article,id)=>{
+    const metadata={parts:[{template:{target:{wt:"Paid",href:"./Template:Paid"},params:{article:{wt:`[[${article}]]`},employer:{wt:"Fixture Corporation"}},i:0}}]};
+    return `<span class="mw-empty-elt" about="${about}" typeof="mw:Transclusion" data-mw='${JSON.stringify(metadata)}'></span><div class="userbox" about="${about}" id="${id}">This user has been paid to contribute to <a href="./${article.replaceAll(" ","_")}">${article}</a>.</div>`;
+  };
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><base href="https://en.wikipedia.org/wiki/"><link rel="canonical" href="https://en.wikipedia.org/wiki/User:FixtureEditor"><style>body{font:16px Arial;margin:30px}.userbox{border:1px solid #aaa;margin:30px;padding:20px}</style></head><body class="ns-2 action-view"><h1 id="firstHeading">User:FixtureEditor</h1><div id="mw-content-text"><div class="mw-parser-output">${notice("#mwt1","Other Corporation","other-paid-work")}<div style="height:1800px"></div>${notice("#mwt2","Fixture Corporation","matching-paid-work")}<div style="height:1000px"></div></div></div></body></html>`;
+}
+
+async function makeSourcePage(browser, url, body=talkSourceDocument()) {
+  const context = await browser.newContext({viewport:{width:1100,height:800},reducedMotion:"reduce"});
+  const page = await context.newPage();
+  const errors=[];
+  page.on("pageerror",error=>errors.push(error.message));
+  await page.route("**/*", route => new URL(route.request().url()).hostname === "en.wikipedia.org"
+    ? route.fulfill({contentType:"text/html",body}) : route.abort());
+  await page.addInitScript(()=>{
+    window.__requests=[];
+    const extension={runtime:{sendMessage:async message=>{window.__requests.push(message);return {ok:false,error:"Unexpected source-page scan"};},onMessage:{addListener(){}}},storage:{local:{get:async()=>({})},onChanged:{addListener(){}}}};
+    window.browser=extension;window.chrome=extension;
+  });
+  await page.goto(url);
+  await page.addScriptTag({content:sourceLocator});
+  await page.addScriptTag({content:diffModel});
+  await page.addScriptTag({content:source});
+  return {page,context,errors};
 }
 
 async function waitForStatus(page, text) {
@@ -166,8 +222,11 @@ try {
       await page.locator(".launcher").click();
       assert.match(await page.locator(".card").first().innerText(), /FixtureEditor/);
       assert.match(await page.locator(".facts").innerText(), /Fixture Corporation/);
-      const link = page.getByRole("link", { name: "Source revision 12345", exact: true });
-      assert.equal(await link.getAttribute("href"), paidEvidence.sourceUrl);
+      const link = page.locator(".evidence-source");
+      assert.equal(await link.innerText(), "View disclosure on Talk:Fixture Corporation");
+      await assertSourceDestination(link, paidEvidence);
+      assert.match(await link.getAttribute("title"), /Talk:Fixture Corporation · Revision 12345 · Source page updated Oct 1, 2026/);
+      assert.equal(await page.locator(".evidence-source-date").innerText(), "Source page updated Oct 1, 2026");
       assert.equal(await link.getAttribute("target"), "_blank");
       assert.match(await link.getAttribute("rel"), /noopener/);
       assert.equal(await page.getByText("Sources checked", { exact: true }).count(), 0);
@@ -191,9 +250,10 @@ try {
         const card = cards.nth(index);
         assert.match(await card.locator(".facts").innerText(), /Editor:/);
         assert.match(await card.locator(".facts").innerText(), /Employer:/);
-        const revision = card.getByRole("link", { name: "Source revision 12345", exact: true });
+        const revision = card.locator(".evidence-source");
         assert.match(await revision.getAttribute("title"), /Source page updated/);
-        assert.equal(await revision.getAttribute("href"), paidEvidence.sourceUrl);
+        assert.match(await revision.getAttribute("title"), /Revision 12345/);
+        await assertSourceDestination(revision, index === 0 ? first : other);
         const background = await card.locator(".card-label").evaluate(node => getComputedStyle(node).backgroundColor);
         assert.notEqual(background, "rgba(0, 0, 0, 0)");
         assert.notEqual(background, "rgb(255, 255, 255)");
@@ -211,9 +271,19 @@ try {
     } finally { await context.close(); }
   });
 
-  await check("every notice type has a tinted header and known employer targets remain direct links", async () => {
-    for (const kind of ["paid-disclosure", "paid-notice", "coi", "concern"]) {
-      const evidence = { ...paidEvidence, kind, employerUrl: "https://en.wikipedia.org/wiki/Fixture_Corporation" };
+  await check("notice types have tinted headers and informative source labels, locations and update dates", async () => {
+    const maliciousTitle = '<img src=x onerror="window.__sourceTitleXss=true">';
+    const cases = [
+      {kind:"paid-disclosure",label:"View disclosure on Talk:Fixture Corporation"},
+      {kind:"paid-notice",sourceTemplate:"paid contributions",sourceTitle:"Fixture Corporation",sourceUrl:"https://en.wikipedia.org/w/index.php?title=Fixture_Corporation&oldid=12345",label:"View paid-content notice on Fixture Corporation"},
+      {kind:"coi",sourceTemplate:"connected contributor",sourceRole:"archive",sourceTitle:"Talk:Fixture Corporation/Archive 1",sourceUrl:"https://en.wikipedia.org/w/index.php?title=Talk%3AFixture_Corporation%2FArchive_1&oldid=12345",sourceTimestamp:undefined,label:"View archived COI notice on Talk:Fixture Corporation/Archive 1"},
+      {kind:"paid-disclosure",sourceTemplate:"paid",sourceTitle:"User:FixtureEditor",sourceUrl:"https://en.wikipedia.org/w/index.php?title=User%3AFixtureEditor&oldid=12345",sourceTimestamp:"not-a-date",label:"View disclosure on User:FixtureEditor"},
+      {kind:"concern",sourceTemplate:"undisclosed paid",sourceTitle:maliciousTitle,label:`View concern on ${maliciousTitle}`,requireMarker:false},
+      {kind:"paid-disclosure",sourceRole:"archive",sourceTitle:"Talk:Fixture Corporation/Archive 2",sourceUrl:"https://en.wikipedia.org/w/index.php?title=Talk%3AFixture_Corporation%2FArchive_2&oldid=12345",label:"View archived disclosure on Talk:Fixture Corporation/Archive 2"}
+    ];
+    for (const {label,requireMarker=true,...fields} of cases) {
+      const evidence = { ...paidEvidence, ...fields, employerUrl: "https://en.wikipedia.org/wiki/Fixture_Corporation" };
+      const {kind} = evidence;
       const { page, context } = await makePage(browser, { responses: [success(scanResult([evidence]))] });
       try {
         await waitForStatus(page, kind === "coi" ? "COI notice" : kind === "concern" ? "Payment concern" : "Paid involvement disclosed");
@@ -223,8 +293,102 @@ try {
         assert.notEqual(background, "rgba(0, 0, 0, 0)");
         assert.notEqual(background, "rgb(255, 255, 255)");
         assert.equal(await card.locator(".employer-link").getAttribute("href"), evidence.employerUrl);
+        const source = card.locator(".evidence-source");
+        assert.equal(await source.innerText(), label);
+        await assertSourceDestination(source, evidence, {requireMarker});
+        assert.match(await source.getAttribute("title"), /Revision 12345/);
+        assert.ok((await source.getAttribute("title")).includes(evidence.sourceTitle));
+        if (evidence.sourceTimestamp === paidEvidence.sourceTimestamp) {
+          assert.equal(await card.locator(".evidence-source-date").innerText(), "Source page updated Oct 1, 2026");
+          assert.match(await source.getAttribute("title"), /Source page updated Oct 1, 2026/);
+        } else {
+          assert.equal(await card.locator(".evidence-source-date").count(), 0);
+          assert.doesNotMatch(await source.getAttribute("title"), /Source page updated|Invalid Date|not-a-date/);
+        }
+        assert.doesNotMatch(await card.locator(".card-sources").innerText(), /disclosed on|disclosure date|paid edit on|Revision 12345/i);
+        assert.equal(await source.locator("img,script").count(), 0);
+        assert.equal(await page.evaluate(()=>window.__sourceTitleXss), undefined);
       } finally { await context.close(); }
     }
+  });
+
+  await check("source navigation locates the editor’s disclosure and user-page paid work without matching unrelated content", async () => {
+    const evidence={...paidEvidence,contributor:"Fixture Editor",sourceUrl:`${paidEvidence.sourceUrl}#Previous_notice`};
+    const userEvidence={...paidEvidence,template:"paid",sourceTemplate:"paid",sourceTitle:"User:FixtureEditor",sourceRevision:54321,
+      sourceUrl:"https://en.wikipedia.org/w/index.php?title=User%3AFixtureEditor&oldid=54321",articles:["Fixture Corporation"],relationship:"self-disclosed"};
+    const article=await makePage(browser,{responses:[success(scanResult([evidence,{...userEvidence,id:"source-user-page"}]))]});
+    let destination;
+    let userDestination;
+    let target;
+    try {
+      await waitForStatus(article.page,"Paid involvement disclosed");
+      await openToolbar(article.page);
+      const link=article.page.locator(".card").first().locator(".evidence-source");
+      target=await assertSourceDestination(link,evidence);
+      assert.equal(target.section.replace(/^#/,""),"Previous_notice","Preserve an existing source section in the locator descriptor.");
+      destination=await link.getAttribute("href");
+      const userLink=article.page.locator(".card").nth(1).locator(".evidence-source");
+      await assertSourceDestination(userLink,userEvidence);
+      userDestination=await userLink.getAttribute("href");
+    } finally {await article.context.close();}
+    const unmatched=new URL(destination);
+    unmatched.hash=`wikipaidia-source=${encodeURIComponent(JSON.stringify({...target,editor:"MissingEditor"}))}`;
+    const malformed=new URL(destination);
+    malformed.hash="wikipaidia-source=%7Bbad";
+    for (const {url,match,unmarked} of [
+      {url:destination,match:true},
+      {url:unmatched.href,match:false},
+      {url:paidEvidence.sourceUrl,match:false,unmarked:true},
+      {url:malformed.href,match:false}
+    ]) {
+      const {page,context,errors}=await makeSourcePage(browser,url);
+      try {
+        const highlighted=page.locator("[data-wikipaidia-source-highlight]");
+        if (match) {
+          await page.locator("#matching-editor[data-wikipaidia-source-highlight]").waitFor();
+          assert.equal(await highlighted.count(),1);
+          assert.equal(await highlighted.evaluate(node=>node.tagName),"LI");
+          const status=page.locator("#wikipaidia-source-status");
+          assert.equal(await status.textContent(),"Source evidence highlighted.");
+          assert.equal(await status.getAttribute("role"),"status");
+          const statusBounds=await status.boundingBox();
+          assert.ok(statusBounds.width<=1&&statusBounds.height<=1,"Successful navigation should announce its result without a visible popup.");
+          assert.equal(await page.locator("#discussion-distractor[data-wikipaidia-source-highlight],#other-editor[data-wikipaidia-source-highlight]").count(),0);
+          await page.waitForFunction(()=>{
+            const bounds=document.querySelector("#matching-editor").getBoundingClientRect();
+            return bounds.top>=0&&bounds.bottom<=innerHeight&&scrollY>1000;
+          });
+          await page.screenshot({path:path.join(artifacts,"located-source.png")});
+        } else {
+          if (url===unmatched.href) {
+            await page.locator("#wikipaidia-source-status").waitFor();
+            assert.equal(await page.locator("#wikipaidia-source-status").getAttribute("role"),"status");
+          }
+          assert.equal(await highlighted.count(),0);
+          if (unmarked) assert.equal(await page.locator("#wikipaidia-source-status").count(),0);
+        }
+        assert.equal(new URL(page.url()).searchParams.get("title"),"Talk:Fixture_Corporation");
+        assert.equal(new URL(page.url()).searchParams.get("oldid"),"12345");
+        assert.equal(await page.locator("#wikipaidia-extension-root").count(),0);
+        assert.deepEqual(await page.evaluate(()=>window.__requests),[]);
+        assert.deepEqual(errors,[]);
+      } finally {await context.close();}
+    }
+    const {page,context,errors}=await makeSourcePage(browser,userDestination,userSourceDocument());
+    try {
+      await page.locator("#matching-paid-work[data-wikipaidia-source-highlight]").waitFor();
+      assert.equal(await page.locator("[data-wikipaidia-source-highlight]").count(),1);
+      assert.equal(await page.locator("#other-paid-work[data-wikipaidia-source-highlight]").count(),0);
+      await page.waitForFunction(()=>{
+        const bounds=document.querySelector("#matching-paid-work").getBoundingClientRect();
+        return bounds.top>=0&&bounds.bottom<=innerHeight&&scrollY>1000;
+      });
+      assert.equal(new URL(page.url()).searchParams.get("title"),"User:FixtureEditor");
+      assert.equal(new URL(page.url()).searchParams.get("oldid"),"54321");
+      assert.equal(await page.locator("#wikipaidia-extension-root").count(),0);
+      assert.deepEqual(await page.evaluate(()=>window.__requests),[]);
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
   });
 
   const articleEdit = { revid: 4002, parentid: 4001, timestamp: "2022-06-07T00:23:39Z", user: "FixtureEditor",
@@ -657,7 +821,7 @@ try {
       await page.getByRole("button", { name: "Retry article edits", exact: true }).click();
       await page.getByRole("button", { name: "Retry changes", exact: true }).click();
       await page.locator(".change-unified").waitFor();
-      assert.equal(await page.getByRole("link", { name: "Source revision 12345", exact: true }).count(), 1);
+      await assertSourceDestination(page.locator(".evidence-source"), paidEvidence);
       assert.equal((await page.evaluate(() => window.__requests)).filter(r => r.type === "GET_EDIT_DIFF").length, 2);
     } finally { await context.close(); }
   });
@@ -831,7 +995,7 @@ try {
     const before = "Unchanged context before the edited sentence. ".repeat(12)+"The founder stepped down in 2021 but remained chairman. "+"Unchanged context after the edited sentence. ".repeat(12);
     const after = before.replace("2021 but","2021, but");
     const extra = {...paidEvidence,id:"user-disclosure",sourceTitle:"User:FixtureEditor",sourceRevision:54321,
-      sourceUrl:"https://en.wikipedia.org/w/index.php?title=User%3AFixtureEditor&oldid=54321",relationship:"user-page"};
+      sourceUrl:"https://en.wikipedia.org/w/index.php?title=User%3AFixtureEditor&oldid=54321",relationship:"user-page",template:"paid",sourceTemplate:"paid"};
     const contextNotice = {id:"coi-reading-context",kind:"coi",coiType:"article-notice",sourceTitle:"Talk:Fixture Corporation",sourceRevision:777,
       sourceUrl:"https://en.wikipedia.org/w/index.php?title=Talk%3AFixture_Corporation&oldid=777",
       connection:"This existing notice provides a detailed account of the recorded professional connection. ".repeat(24)};
@@ -867,7 +1031,7 @@ try {
       assert.ok(scrollBefore>0,"This fixture should exercise the panel while it is scrolled.");
       const requestsBefore = await page.evaluate(()=>window.__requests.filter(request=>request.type!=="SCAN_ARTICLE"));
       await releaseRequest(page,"SCAN_ARTICLE",1);
-      await page.getByRole("link",{name:"Source revision 54321",exact:true}).waitFor();
+      await page.locator('.evidence-source[title*="Revision 54321"]').waitFor();
       assert.equal(await page.locator(".card").count(),3);
       const first = page.locator(".card").first();
       assert.equal(await first.evaluate(node=>node===window.__existingCard),true);
@@ -906,14 +1070,15 @@ try {
         await releaseRequest(page,"SCAN_ARTICLE",1);
         await page.waitForFunction(()=>window.__completedRequests.filter(type=>type==="SCAN_ARTICLE").length===2);
         await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));
-        assert.equal(await page.getByRole("link",{name:"Source revision 12345",exact:true}).count(),0);
+        assert.equal(await page.locator('.evidence-source[title*="Revision 12345"]').count(),0);
         assert.equal(await page.evaluate(()=>window.__obsoleteCard.isConnected),false);
         assert.equal(await page.locator(".card").count(),replacement.length);
         if (replacement.length) {
           assert.equal(await page.locator(".card").evaluate(node=>node.open),false,"Replacing a changed card with the same key should retain its collapsed state.");
           assert.equal(await page.locator(".card > .card-body").isVisible(),false);
           await page.locator(".card > .card-label").click();
-          assert.equal(await page.getByRole("link",{name:"Source revision 54322",exact:true}).getAttribute("href"),revised.sourceUrl);
+          await assertSourceDestination(page.locator(".evidence-source"), revised);
+          assert.match(await page.locator(".evidence-source").getAttribute("title"),/Revision 54322/);
           assert.equal(await page.locator(".page-tint").isVisible(),true);
         } else {
           await waitForStatus(page,"No disclosure found");
@@ -960,6 +1125,7 @@ try {
     ].map(request => ({ ...request, sourceUrl: archiveUrl, sectionUrl: `${archiveUrl}#${request.sectionTitle.replaceAll(" ", "_")}` }));
     const group = {
       id: "coi-request-group", kind: "coi", coiType: "edit-request-group", sourceRole: "archive",
+      template: "edit coi", sourceTemplate: "edit coi",
       sourceTitle: archive, sourceUrl: archiveUrl, sourceRevision: 1173563426,
       requestCount: requests.length, requests
     };
@@ -975,6 +1141,8 @@ try {
       assert.equal(await connection.locator(".editor-link").getAttribute("href"), "https://en.wikipedia.org/wiki/Special:Contributions/192.0.2.34");
       const requestCard = page.locator(".card").filter({ has: page.locator(".coi-request") });
       assert.match(await requestCard.locator(".card-label").innerText(), /COI edit requests.*3/);
+      assert.equal(await requestCard.locator(".evidence-source").innerText(), `View archived edit requests on ${archive}`);
+      await assertSourceDestination(requestCard.locator(".evidence-source"), group);
       assert.match(await requestCard.locator(".coi-origin").innerText(), /Archived discussion/);
       assert.equal(await requestCard.locator(".coi-request").count(), 3);
       await requestCard.getByText("View 3 requests", { exact: true }).click();
@@ -1003,6 +1171,7 @@ try {
       { ...paidEvidence, id: "coi-unspecified", kind: "coi", coiType: "connected-contributor", employer: undefined,
         connection: "The notice lists a personal or professional connection; the relationship is not specified.", declarationStatus: "unspecified" },
       { id: "coi-request-unsafe", kind: "coi", coiType: "edit-request", sourceRole: "archive",
+        template: "edit coi", sourceTemplate: "edit coi",
         sourceTitle: "Talk:Fixture Corporation/Archive 1", sourceUrl: paidEvidence.sourceUrl, sourceRevision: 12345,
         sectionTitle: "Unverified request", sectionUrl: "javascript:alert(1)", requestSummary: malicious,
         contextExcerpt: malicious, requestStatus: "answered" }
@@ -1012,6 +1181,7 @@ try {
       await waitForStatus(page, "COI notice");
       await openToolbar(page);
       assert.match(await page.locator(".coi-explanation").first().innerText(), /relationship is not specified/);
+      assert.equal(await page.locator(".card").last().locator(".evidence-source").innerText(), "View archived edit request on Talk:Fixture Corporation/Archive 1");
       assert.match(await page.locator(".card").last().textContent(), /<img src=x/);
       assert.equal(await page.locator(".card img,.card script").count(), 0);
       const destinations = await page.locator(".card a").evaluateAll(nodes => nodes.map(node => node.href));
@@ -1041,6 +1211,7 @@ try {
       await waitForStatus(page, "Paid involvement disclosed");
       await page.locator(".launcher").click();
       assert.match(await page.locator(".card").textContent(), /<img/);
+      assert.equal(await page.locator(".evidence-source,.evidence-source-date").count(), 0);
       assert.equal(await page.locator(".card img,.card script").count(), 0);
       const destinations = await page.locator(".card a").evaluateAll(nodes => nodes.map(node => node.href));
       assert.ok(destinations.every(href => new URL(href).origin === "https://en.wikipedia.org"));

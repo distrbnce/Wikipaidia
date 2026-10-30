@@ -24,6 +24,7 @@ test("extracts multiple paid relationships without assigning a paid revision", (
   assert.match(result[0].summary, /paid revisions not verified/);
   assert.match(result[1].summary, /edits or accepted requests not verified/);
   assert.equal(result[0].sourceRevision, 1234);
+  assert.equal(result[0].sourceTemplate, "connected contributor (paid)");
   assert.equal(new URL(result[0].sourceUrl).searchParams.get("oldid"), "1234");
   assert.notEqual(result[0].id, result[1].id);
   assert.doesNotMatch(result[0].excerpt, /Bob|Agency/);
@@ -313,6 +314,7 @@ I have been asked to update my previous paid work. [[User:Example]] 06:18, 1 Feb
 test("known live template redirects preserve the distinction between disclosures and concerns", () => {
   const [paid] = analyze("{{Connpaid|User=Alice|U1-employer=Acme|editedhere=yes}}");
   assert.equal(paid.kind, "paid-disclosure");
+  assert.equal(paid.sourceTemplate, "connpaid");
   assert.equal(paid.directEdit, true);
   const [concern] = analyze("{{Paid edit}}", { role: "article", title: "Example" });
   assert.equal(concern.kind, "concern");

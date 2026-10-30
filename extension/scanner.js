@@ -1,7 +1,7 @@
 import { analyzePage } from "./evidence.js";
 import { createWikiClient } from "./wiki-api.js";
 
-export const SCAN_VERSION = 6;
+export const SCAN_VERSION = 7;
 export const LIMITS = Object.freeze({ archives: 5, userPages: 8, contributorRevisions: 50 });
 const UNCHECKED_SOURCES = "User pages, talk archives, and past revisions have not been checked.";
 const HISTORICAL_COVERAGE = "Notices may describe historical involvement; current text is not assessed.";
@@ -45,6 +45,7 @@ export function groupCoiRequests(evidence) {
       sourceRevision: request.sourceRevision,
       sourceTimestamp: request.sourceTimestamp,
       sourceRole: request.sourceRole,
+      sourceTemplate: request.sourceTemplate,
       contributor: request.contributor,
       requestSummary: request.requestSummary,
       requestSummaryExplicit: request.requestSummaryExplicit,
@@ -58,7 +59,7 @@ export function groupCoiRequests(evidence) {
       summary: `${requests.length} edit requests in this discussion. A request does not establish payment or implementation.`,
       sourceTitle: item.sourceTitle, sourceUrl: item.sourceUrl,
       sourceRevision: item.sourceRevision, sourceTimestamp: item.sourceTimestamp,
-      sourceRole: item.sourceRole, template: item.template, relationship: item.relationship,
+      sourceRole: item.sourceRole, sourceTemplate: item.sourceTemplate, template: item.template, relationship: item.relationship,
     });
   }
   return output;

@@ -98,8 +98,14 @@ paid for. Start with **Subway, Amway, and Cisco** to compare different card type
   redirects are included.
 - Each disclosure has a tinted type header, linked **Editor:** and **Employer:**
   fields, and source links. Explicit employer wikilinks keep their original target;
-  plain employer names link to Wikipedia search. Source revision links open the
-  exact snapshot; their tooltip shows when the source page was updated.
+  plain employer names link to Wikipedia search. Evidence links name the notice
+  and its source page, with the source-page update date below. They open the exact
+  snapshot; revision numbers remain in their tooltips. That date describes the
+  source page version, not when the paid relationship began or was disclosed.
+  Following an evidence link highlights the matching editor's entry or notice
+  in that saved page and scrolls it into view. Source pages use the same
+  English Wikipedia permission and do not run another article scan. If the
+  matching notice cannot be located, the page shows a short status message.
   Click any evidence header to collapse or expand its section. Sections start
   expanded and keep their state while additional sources and edits load.
 - Opening the panel automatically shows each paid contributor's three latest
@@ -160,13 +166,17 @@ sources are current and may describe another period.
 
 ## Privacy and permissions
 
+Read the [privacy policy](PRIVACY.md) for details or visit
+[support](store-submissions/support.md) for help.
+
 - Only `https://en.wikipedia.org/*` access and the `storage` permission.
 - No account, backend, telemetry, external model, or analytics.
 - Requests go directly to the public English Wikipedia API with login credentials
   omitted. It receives article/user-page titles and ordinary network information.
-- Results are cached locally in browser session storage for 15 minutes, capped at
-  30 checks; the cache is cleared when the browser session ends. Storage failures
-  do not prevent a check.
+- Up to 30 scan results are cached locally in browser session storage and may be
+  reused for 15 minutes. Expired entries can remain until eviction or the browser
+  session ends; the session cache is cleared when that session ends. Storage
+  failures do not prevent a check.
 - Only your alert-style and color preferences are kept in persistent local extension storage.
 - Public wikitext is rendered as text. Source links are restricted to HTTPS
   English Wikipedia URLs. Nothing edits or posts to Wikipedia.
@@ -213,9 +223,9 @@ load the extracted folders; Safari also supports its temporary-extension ZIP flo
 `extension/` is the source of truth. The Safari build helper generates the ignored
 native wrapper in `safari/Wikipaidia/` before compiling the unsigned development
 app. Run `npm run build:safari` on macOS with full Xcode installed. This local
-version is not signed or notarized. Before store distribution, add a maintainer
-contact to the API client identifier and complete the appropriate review and
-signing steps.
+version is not signed or notarized. The API client identifier includes the project
+URL for maintainer contact. Store distribution requires the appropriate review
+and signing steps.
 
 GitHub Actions runs source checks, unit tests, browser fixture tests, Chromium
 extension integration tests, and ZIP packaging for pushes and pull requests. See

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Wikipaidia",
   "short_name": "Wikipaidia",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Shows disclosed paid involvement on English Wikipedia.",
   "permissions": [
     "storage"
@@ -28,6 +28,7 @@
         "https://en.wikipedia.org/w/index.php*"
       ],
       "js": [
+        "source-locator.js",
         "diff-model.js",
         "content.js"
       ],

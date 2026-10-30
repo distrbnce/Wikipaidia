@@ -1,5 +1,5 @@
 export const API_ENDPOINT = "https://en.wikipedia.org/w/api.php";
-export const CLIENT_ID = "Wikipaidia/0.10 (local Web Extension; public disclosure reader)";
+export const CLIENT_ID = "Wikipaidia/0.11 (+https://github.com/distrbnce/Wikipaidia; public disclosure reader)";
 export const ARTICLE_DIFF_TEXT_LIMIT = 20000;
 
 export class WikiApiError extends Error {
