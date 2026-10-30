@@ -23,8 +23,8 @@ confirmed cause. The app has not been submitted for review.
 - Registered SKU: `wikipaidia-macos`.
 - Safari ZIP uploaded and associated with Wikipaidia; build **0.11.0 (1)** failed
   during App Store export. The refreshed candidate with the content-license
-  notice is uploaded as **0.11.0 (2)** and is being packaged. No signed build is
-  ready for review.
+  notice was uploaded as **0.11.0 (2)** and failed with the same export error.
+  No signed build is ready for review.
 - A local Release archive compiled for Intel and Apple silicon, with a macOS
   13.0 deployment target and the registered identifiers. It still needs
   distribution signing, upload and native runtime testing.

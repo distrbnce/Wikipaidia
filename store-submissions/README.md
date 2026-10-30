@@ -63,9 +63,9 @@ has been uploaded and associated with Wikipaidia. Build **0.11.0 (1)** failed
 while exporting for App Store distribution. Apple's issues page requests a logs
 artifact but exposes no download control; the underlying export failure remains
 unknown. The unsupported-manifest-key warning alone does not establish its cause.
-The refreshed candidate, including the in-panel content-license notice, is
-uploaded as **0.11.0 (2)** and is being packaged. A local Release archive also
-compiled for Intel and Apple silicon with a macOS 13.0 deployment target; it is
+The refreshed candidate, including the in-panel content-license notice, was
+uploaded as **0.11.0 (2)** and failed with the same export error. A local Release
+archive compiled for Intel and Apple silicon with a macOS 13.0 deployment target; it is
 not signed for distribution and has not been tested on every supported OS.
 
 Three labeled WebKit fixture screenshots have been uploaded to the listing.
