@@ -67,13 +67,14 @@ an article with no findings.
 
 ### Example articles
 
-Alongside [BP](https://en.wikipedia.org/wiki/BP) and
-[Vivek Ramaswamy](https://en.wikipedia.org/wiki/Vivek_Ramaswamy), try these articles
-after enabling Wikipaidia. Open the article link to see the page alert and evidence
-panel; the source link shows the supporting talk-page revision.
+After enabling Wikipaidia, open any article below to try the page alert and
+evidence panel. Each row describes what to look for and links to the supporting
+talk-page revision.
 
 | Article | What to try | Supporting notice |
 | --- | --- | --- |
+| [BP](https://en.wikipedia.org/wiki/BP) | Three paid-contributor cards and grouped COI edit requests. | [Source](https://en.wikipedia.org/w/index.php?title=Talk%3ABP&oldid=1370681720) |
+| [Vivek Ramaswamy](https://en.wikipedia.org/wiki/Vivek_Ramaswamy) | Two paid-contributor cards and separate general COI notices. | [Source](https://en.wikipedia.org/w/index.php?title=Talk%3AVivek%20Ramaswamy&oldid=1382857147) |
 | [Subway](https://en.wikipedia.org/wiki/Subway_(restaurant)) | Two paid-contributor cards. | [Source](https://en.wikipedia.org/w/index.php?title=Talk:Subway_(restaurant)&oldid=1382811405) |
 | [Amway](https://en.wikipedia.org/wiki/Amway) | A paid disclosure alongside a separate general COI notice. | [Source](https://en.wikipedia.org/w/index.php?title=Talk:Amway&oldid=1291886505) |
 | [Cisco](https://en.wikipedia.org/wiki/Cisco) | A paid disclosure and grouped COI edit requests. | [Source](https://en.wikipedia.org/w/index.php?title=Talk:Cisco&oldid=1382111110) |
@@ -82,7 +83,7 @@ panel; the source link shows the supporting talk-page revision.
 | [Quantum computing](https://en.wikipedia.org/wiki/Quantum_computing) | A paid disclosure naming an agency, Beutler Ink. | [Source](https://en.wikipedia.org/w/index.php?title=Talk:Quantum_computing&oldid=1379513429) |
 | [United States Postal Service](https://en.wikipedia.org/wiki/United_States_Postal_Service) | A paid disclosure plus grouped edit requests. | [Source](https://en.wikipedia.org/w/index.php?title=Talk:United_States_Postal_Service&oldid=1375337566) |
 
-These seven examples returned paid-disclosure findings in a basic scan on
+These examples returned paid-disclosure findings in a basic scan on
 **October 30, 2026**. Live notices and results can change. The notices document
 publicly declared involvement; they do not establish which current sentences were
 paid for. Start with **Subway, Amway, and Cisco** to compare different card types.
