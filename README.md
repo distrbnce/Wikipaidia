@@ -15,6 +15,11 @@ Pablo Torre Finds Out, Wikipedia, or the Wikimedia Foundation.
 
 ## Try it
 
+Download the ZIP for your browser from the
+[latest GitHub release](https://github.com/distrbnce/Wikipaidia/releases/latest),
+then follow the installation steps below. You can also use this repository's
+`extension/` folder directly.
+
 The setup below uses local developer loading. Safari, Chrome, and Edge share the
 same [`extension`](extension/) source; store submission is a separate distribution
 step.

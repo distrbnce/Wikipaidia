@@ -15,6 +15,8 @@ async function walk(dir, prefix = "") {
   }
 }
 await walk(source);
+// Distribute the project's license notice with every downloadable package.
+files.push(["LICENSE", await readFile(path.join(root, "LICENSE"))]);
 function crc32(bytes) {
   let crc = 0xffffffff;
   for (const byte of bytes) {
