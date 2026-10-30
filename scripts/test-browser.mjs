@@ -5,12 +5,14 @@ import { fileURLToPath } from "node:url";
 import { chromium, webkit } from "playwright";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const chromePath = process.env.WIKIPAIDIA_CHROME_PATH || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const chromePath = process.env.WIKIPAIDIA_CHROME_PATH;
 const source = await readFile(path.join(root, "extension/content.js"), "utf8");
 const diffModel = await readFile(path.join(root, "extension/diff-model.js"), "utf8");
-const artifacts = path.join(root, "test-results");
-const engineName = process.env.WIKIPAIDIA_BROWSER || "chromium";
-if (!["chromium", "webkit"].includes(engineName)) throw new Error("WIKIPAIDIA_BROWSER must be chromium or webkit.");
+const engineName = process.argv[2] || process.env.WIKIPAIDIA_BROWSER || "chromium";
+if (process.argv.length > 3 || !["chromium", "chrome", "msedge", "webkit"].includes(engineName)) {
+  throw new Error("Usage: node scripts/test-browser.mjs [chromium|chrome|msedge|webkit]; WIKIPAIDIA_BROWSER accepts the same values.");
+}
+const artifacts = path.join(root, "test-results", engineName);
 await mkdir(artifacts, { recursive: true });
 
 const paidEvidence = {
@@ -50,7 +52,7 @@ async function makeContext(browser, { viewport = { width: 1280, height: 900 }, p
 
 async function makePage(browser, {
   responses = [success(scanResult())], url = "https://en.wikipedia.org/wiki/Fixture_Corporation",
-  namespace = "ns-0", viewport, runtime = "browser", preference, color, context: suppliedContext,
+  namespace = "ns-0", viewport, runtime = engineName === "webkit" ? "browser" : "chrome", preference, color, context: suppliedContext,
   responseDelay = 10, messageResponses = {}, messageDelays = {}, heldMessages = {}
 } = {}) {
   const context = suppliedContext || await makeContext(browser, { viewport, preference, color });
@@ -143,7 +145,11 @@ async function check(name, fn) {
 
 try {
   if (engineName === "webkit") browser = await webkit.launch({ headless: true });
-  else { await access(chromePath); browser = await chromium.launch({ executablePath: chromePath, headless: true }); }
+  else {
+    if (chromePath) await access(chromePath);
+    browser = await chromium.launch({ ...(chromePath ? { executablePath: chromePath } : { channel: engineName }), headless: true });
+  }
+  console.log(`Running ${engineName} browser fixtures (${browser.version()})${chromePath && engineName !== "webkit" ? " with an explicit executable override" : ""}.`);
 
   await check("paid evidence adds a concise top alert and preserves article text", async () => {
     const { page, context } = await makePage(browser, { responses: [success(scanResult([paidEvidence]))] });
@@ -156,7 +162,7 @@ try {
       assert.ok(alert.y >= heading.y && alert.y < heading.y + heading.height + 60);
       assert.equal(await page.locator("#article-text").innerText(), "This fictional article verifies the Wikipaidia extension.");
       assert.equal(await page.locator(".brand-caption,.lead,.footer").count(), 0);
-      await page.screenshot({ path: path.join(artifacts, engineName === "webkit" ? "top-alert.png" : "top-alert-chromium.png") });
+      await page.screenshot({ path: path.join(artifacts, "top-alert.png") });
       await page.locator(".launcher").click();
       assert.match(await page.locator(".card").first().innerText(), /FixtureEditor/);
       assert.match(await page.locator(".facts").innerText(), /Fixture Corporation/);
@@ -167,7 +173,7 @@ try {
       assert.equal(await page.getByText("Sources checked", { exact: true }).count(), 0);
       assert.equal(await page.locator(".coverage,.source-meta").count(), 0);
       assert.equal(await page.getByText("Cached", { exact: true }).count(), 0);
-      await page.screenshot({ path: path.join(artifacts, engineName === "webkit" ? "compact-evidence.png" : "compact-evidence-chromium.png") });
+      await page.screenshot({ path: path.join(artifacts, "compact-evidence.png") });
     } finally { await context.close(); }
   });
 
@@ -431,7 +437,7 @@ try {
       assert.equal(await unified.locator(".diff-add").textContent(), ",");
       await page.getByRole("button", { name: "See Less...", exact: true }).click();
       assert.equal(await unified.textContent(), compact);
-      await page.getByRole("dialog").screenshot({ path: path.join(artifacts, engineName === "webkit" ? "contextual-diff.png" : "contextual-diff-chromium.png") });
+      await page.getByRole("dialog").screenshot({ path: path.join(artifacts, "contextual-diff.png") });
     } finally { await context.close(); }
   });
 
@@ -492,7 +498,7 @@ try {
         ["GET_CONTRIBUTOR_EDITS", "Fixture Corporation", "FixtureEditor", null],
         ["GET_EDIT_DIFF", "Fixture Corporation", "FixtureEditor", 4002]
       ]);
-      await page.screenshot({ path: path.join(artifacts, engineName === "webkit" ? "article-changes.png" : "article-changes-chromium.png") });
+      await page.screenshot({ path: path.join(artifacts, "article-changes.png") });
     } finally { await context.close(); }
   });
 
@@ -706,7 +712,7 @@ try {
       assert.equal(await page.evaluate(() => window.__articleClicked), true);
       assert.equal(await page.locator(".launcher").isVisible(), true);
       assert.match(await page.locator(".launcher").getAttribute("aria-label"), /Paid involvement disclosed/);
-      await page.screenshot({ path: path.join(artifacts, engineName === "webkit" ? "page-tint.png" : "page-tint-chromium.png") });
+      await page.screenshot({ path: path.join(artifacts, "page-tint.png") });
     } finally { await context.close(); }
   });
 
@@ -987,7 +993,7 @@ try {
       assert.equal(await answered.getByText("Accepted", { exact: true }).count(), 0);
       assert.equal(await answered.getByText("Implemented", { exact: true }).count(), 0);
       assert.match(await page.locator(".scroll").innerText(), /payment (?:is )?not established|does not establish payment|not proof of payment/i);
-      await page.getByRole("dialog").screenshot({ path: path.join(artifacts, engineName === "webkit" ? "coi-context.png" : "coi-context-chromium.png") });
+      await page.getByRole("dialog").screenshot({ path: path.join(artifacts, "coi-context.png") });
     } finally { await context.close(); }
   });
 
@@ -1095,7 +1101,7 @@ try {
       assert.equal(tint.events, "none");
       await page.locator("#article-button").click();
       assert.equal(await page.evaluate(() => window.__articleClicked), true);
-      await page.screenshot({ path: path.join(artifacts, engineName === "webkit" ? "page-tint-dark.png" : "page-tint-dark-chromium.png") });
+      await page.screenshot({ path: path.join(artifacts, "page-tint-dark.png") });
     } finally { await context.close(); }
   });
 
@@ -1132,9 +1138,11 @@ try {
     } finally { await context.close(); }
   });
 
-  await check("Chrome runtime fallback remains compatible", async () => {
-    const { page, context } = await makePage(browser, { runtime: "chrome" });
-    try { await waitForStatus(page, "No disclosure found"); await assertQuiet(page); } finally { await context.close(); }
+  await check("browser and Chrome runtime namespaces remain compatible", async () => {
+    for (const runtime of ["browser", "chrome"]) {
+      const { page, context } = await makePage(browser, { runtime });
+      try { await waitForStatus(page, "No disclosure found"); await assertQuiet(page); } finally { await context.close(); }
+    }
   });
 
   await check("non-article/edit/history/diff views remain untouched", async () => {

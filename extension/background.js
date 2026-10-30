@@ -33,7 +33,7 @@ async function cachedScan(title, deep, refresh) {
     }
     const result = await scanArticle(title, { deep, ...(baseResult ? { baseResult } : {}) });
     if (baseResult) result.baseCheckedAt = baseResult.checkedAt;
-    // Session storage disappears when Safari quits. No browsing-history database.
+    // Session storage disappears when the browser quits. No browsing-history database.
     if (result.complete) {
       try {
         await webExtension.storage.session?.set({ [key]: result });

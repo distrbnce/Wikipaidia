@@ -45,6 +45,11 @@ const end = Buffer.alloc(22);
 end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(files.length, 8); end.writeUInt16LE(files.length, 10);
 end.writeUInt32LE(directory.length, 12); end.writeUInt32LE(offset, 16);
 await mkdir(path.join(root, "dist"), { recursive: true });
-const output = path.join(root, "dist", `Wikipaidia-Safari-${version}.zip`);
-await writeFile(output, Buffer.concat([...local, directory, end]));
-console.log(`Packaged ${files.length} files: ${output}`);
+// All three browsers use the same Manifest V3 source. Keep the existing Safari
+// filename and provide explicit packages for Chrome and Edge installations.
+const archive = Buffer.concat([...local, directory, end]);
+for (const browser of ["Chrome", "Edge", "Safari"]) {
+  const output = path.join(root, "dist", `Wikipaidia-${browser}-${version}.zip`);
+  await writeFile(output, archive);
+  console.log(`Packaged ${files.length} files for ${browser}: ${output}`);
+}

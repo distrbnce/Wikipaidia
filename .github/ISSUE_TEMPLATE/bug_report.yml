@@ -19,7 +19,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      placeholder: Safari version, macOS version, Wikipaidia version and loading method
+      placeholder: Browser and version, operating system, Wikipaidia version and loading method
     validations:
       required: true
   - type: textarea

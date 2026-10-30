@@ -1,9 +1,9 @@
 {
   "name": "wikipaidia",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "private": true,
   "type": "module",
-  "description": "A local-first Safari Web Extension that surfaces public paid-editing disclosures on English Wikipedia.",
+  "description": "A local-first extension for Safari, Chrome, and Edge that surfaces public paid-editing disclosures on English Wikipedia.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,6 +16,9 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "test:browser": "node scripts/test-browser.mjs",
+    "test:chrome": "node scripts/test-browser.mjs chrome",
+    "test:edge": "node scripts/test-browser.mjs msedge",
+    "test:webkit": "node scripts/test-browser.mjs webkit",
     "test:extension": "node scripts/test-extension.mjs",
     "check": "node scripts/check.mjs",
     "package": "node scripts/package.mjs",

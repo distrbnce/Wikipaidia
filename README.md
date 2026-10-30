@@ -1,6 +1,7 @@
 # Wikipaidia
 
-A Safari Web Extension that flags disclosed paid involvement on English Wikipedia.
+A browser extension for desktop Safari, Chrome, and Microsoft Edge that flags
+disclosed paid involvement on English Wikipedia.
 
 ## Inspiration
 
@@ -12,15 +13,42 @@ to find while reading Wikipedia.
 This is an independent project with no affiliation with or endorsement from
 Pablo Torre Finds Out, Wikipedia, or the Wikimedia Foundation.
 
-## Try it in Safari
+## Try it
+
+The setup below uses local developer loading. Safari, Chrome, and Edge share the
+same [`extension`](extension/) source; store submission is a separate distribution
+step.
+
+### Chrome and Edge
+
+1. Open `chrome://extensions` in Chrome or `edge://extensions` in Edge.
+2. Turn on **Developer mode**, then choose **Load unpacked**.
+3. Select this repository's [`extension`](extension/) folder. If using a ZIP from
+   `npm run package`, extract `Wikipaidia-Chrome-<version>.zip` or
+   `Wikipaidia-Edge-<version>.zip` first and select the folder containing
+   `manifest.json`.
+4. Open the browser's **Extensions** menu and pin/show Wikipaidia on the toolbar.
+5. Allow site access to **en.wikipedia.org**, then reload an English Wikipedia
+   article. Click Wikipaidia's toolbar icon to open the evidence panel.
+
+After source changes, reload Wikipaidia on the extensions page and reload the
+article. [CHROMIUM.md](CHROMIUM.md) has browser-specific steps and official guides.
+
+### Safari
 
 1. Open Safari **Settings → Advanced → Show features for web developers**.
 2. Open **Settings → Developer → Add Temporary Extension…** and select the
-   [`extension`](extension/) folder, or the ZIP produced by `npm run package`.
+   [`extension`](extension/) folder, or `Wikipaidia-Safari-<version>.zip` produced by
+   `npm run package`.
 3. Enable Wikipaidia in **Settings → Extensions** and allow **en.wikipedia.org**.
 4. Reload an English Wikipedia article. A notice appears at the top when paid
    involvement is found. Click it to see evidence. [BP](https://en.wikipedia.org/wiki/BP)
    is a public example; live disclosures can change.
+
+Temporary loading is available in current Safari and expires after 24 hours or
+when Safari quits. [SAFARI.md](SAFARI.md) covers native app builds and older Safari.
+
+### Use the panel
 
 In the panel header, choose **Banner** or **Page Tint**, then pick an alert color.
 Both choices are saved locally and apply to other open articles. The same color
@@ -29,11 +57,8 @@ at the top; its overlay does not block links or text selection. Only paid disclo
 and paid-content notices activate these page alerts. Other COI notices and unverified
 payment concerns remain in the panel.
 
-Use the Safari toolbar extension button to open the panel or change alert style on
+Use the browser toolbar extension button to open the panel or change alert style on
 an article with no findings.
-
-Temporary loading is available in current Safari and expires after 24 hours or
-when Safari quits. [SAFARI.md](SAFARI.md) covers native app builds and older Safari.
 
 ## What this version does
 
@@ -125,39 +150,46 @@ dependencies and no bundling step.
 
 ```sh
 npm ci
+npx playwright install chromium webkit
 npm run check
 npm test
 npm run test:browser
-npx playwright install chromium webkit
 npm run test:extension
-WIKIPAIDIA_BROWSER=webkit npm run test:browser
+npm run test:webkit
 npm run package
-npm run build:safari
 ```
 
-`test:browser` uses an installed Chrome by default; set `WIKIPAIDIA_CHROME_PATH`
-to its executable elsewhere. To run the same fixture-based UI tests in WebKit:
+`test:browser` uses Playwright's bundled Chromium. The same fixture-based UI
+checks can run in installed desktop Google Chrome or Microsoft Edge:
 
 ```sh
-npx playwright install webkit
-WIKIPAIDIA_BROWSER=webkit npm run test:browser
+npm run test:chrome
+npm run test:edge
 ```
 
-The extension integration test uses Playwright's bundled Chromium and an isolated
-temporary browser profile; current branded Chrome does not support its side-loading
-flags. This test verifies the real worker and messaging, while the WebKit suite
-verifies interface behavior in Safari's rendering engine.
-Both browser test suites use fictional fixtures and do not call Wikipedia. Optional
-live API check: `node scripts/smoke-live.mjs BP` (add `--deep` for the bounded deeper
-scan). Screenshots are written to `test-results/`.
+These UI tests inject the content script with mocked extension APIs; they check
+rendering and interaction in each browser. `test:webkit` checks WebKit rendering.
+`test:extension` loads the real extension in bundled Chromium with an isolated
+temporary profile and verifies its worker and messaging. Chrome and Edge have
+removed the command-line flags used for automated extension loading, so that test
+uses bundled Chromium, as recommended by
+[Playwright](https://playwright.dev/docs/chrome-extensions).
+Browser tests use fictional fixtures and do not call Wikipedia. Optional live API
+check: `node scripts/smoke-live.mjs BP` (add `--deep` for the bounded deeper scan).
+Screenshots are written to `test-results/`.
+
+`npm run package` writes Chrome, Edge, and Safari ZIPs to `dist/`, each containing
+the same extension source. These are developer-loading packages. Chrome and Edge
+load the extracted folders; Safari also supports its temporary-extension ZIP flow.
 
 `extension/` is the source of truth. The Safari build helper generates the ignored
 native wrapper in `safari/Wikipaidia/` before compiling the unsigned development
-app. This local version is not signed, notarized, or published to the App Store. Before public
-distribution, add a maintainer contact to the API client identifier and complete
-the appropriate signing and store review.
+app. Run `npm run build:safari` on macOS with full Xcode installed. This local
+version is not signed or notarized. Before store distribution, add a maintainer
+contact to the API client identifier and complete the appropriate review and
+signing steps.
 
-GitHub Actions runs the source checks, unit tests, WebKit interface tests, Chromium
+GitHub Actions runs source checks, unit tests, browser fixture tests, Chromium
 extension integration tests, and ZIP packaging for pushes and pull requests. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for setup, checks, and contribution guidance.
 
@@ -176,6 +208,8 @@ executing wikitext. Results carry their exact source links into the panel.
 - [Connected contributor (paid) documentation](https://en.wikipedia.org/wiki/Template:Connected_contributor_(paid)/doc)
 - [MediaWiki API access policy](https://www.mediawiki.org/wiki/Wikimedia_APIs/Access_policy)
 - [Apple: Running your Safari web extension](https://developer.apple.com/documentation/safariservices/running-your-safari-web-extension)
+- [Google: Load an unpacked extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
+- [Microsoft: Sideload an extension](https://learn.microsoft.com/en-us/microsoft-edge/extensions/getting-started/extension-sideloading)
 
 Code is available under the MIT license. Wikipedia source text remains under its
 applicable license; evidence links provide source and contributor attribution.

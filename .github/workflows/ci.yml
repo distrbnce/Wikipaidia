@@ -30,11 +30,11 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run package
-      - name: Save temporary Safari extension package
+      - name: Save extension packages
         uses: actions/upload-artifact@v7
         with:
-          name: safari-extension-package
-          path: dist/Wikipaidia-Safari-*.zip
+          name: browser-extension-packages
+          path: dist/Wikipaidia-*.zip
           if-no-files-found: error
           retention-days: 7
 
@@ -45,7 +45,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, webkit]
+        browser: [chromium, chrome, msedge, webkit]
     env:
       WIKIPAIDIA_BROWSER: ${{ matrix.browser }}
     steps:
@@ -60,13 +60,9 @@ jobs:
       - name: Install browser and system dependencies
         run: npx playwright install --with-deps "$WIKIPAIDIA_BROWSER"
       - name: Run browser fixture tests
-        shell: bash
-        run: |
-          if [[ "$WIKIPAIDIA_BROWSER" == chromium ]]; then
-            export WIKIPAIDIA_CHROME_PATH="$(node --input-type=module -e 'import { chromium } from "playwright"; process.stdout.write(chromium.executablePath());')"
-          fi
-          npm run test:browser
+        run: npm run test:browser
       - name: Run installed-extension integration tests
+        # Branded Chrome and Edge cannot side-load via automation flags.
         if: matrix.browser == 'chromium'
         run: npm run test:extension
       - name: Save browser screenshots

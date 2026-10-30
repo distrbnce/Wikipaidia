@@ -7,13 +7,13 @@ import { chromium } from "playwright";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const extensionPath = path.join(root, "extension");
-// Branded Chrome no longer supports the side-loading flags; Playwright's
+// Branded Chrome and Edge no longer support the side-loading flags; Playwright's
 // Chromium channel does. An explicit executable remains available for testing
 // with another browser build that supports unpacked extensions.
 const chromePath = process.env.WIKIPAIDIA_CHROME_PATH;
 if (chromePath) await access(chromePath);
 const profile = await mkdtemp(path.join(os.tmpdir(), "wikipaidia-extension-test-"));
-const artifacts = path.join(root, "test-results");
+const artifacts = path.join(root, "test-results", "extension-chromium");
 await mkdir(artifacts, { recursive: true });
 
 function fixturePage(title, ns, revid, content) {

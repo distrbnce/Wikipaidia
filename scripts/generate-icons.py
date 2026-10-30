@@ -38,5 +38,5 @@ def create(size):
     (OUT / f"icon-{size}.png").write_bytes(data)
 
 
-for dimension in (48, 128):
+for dimension in (16, 32, 48, 128):
     create(dimension)
