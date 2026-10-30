@@ -1,0 +1,22 @@
+name: Feature request
+description: Suggest a change to Wikipaidia.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would this help you do?
+      description: Describe the problem or task that motivates the request.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the behavior you would like, with an example if helpful.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Source examples or other context
+      description: For new disclosure types, include public template documentation or source revision links when available.

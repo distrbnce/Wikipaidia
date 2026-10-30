@@ -1,0 +1,29 @@
+name: Bug report
+description: Report an incorrect finding or a problem using Wikipaidia.
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Describe what you expected and what Wikipaidia displayed instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps and source links
+      description: Include steps to reproduce. For a disclosure issue, link the article and exact source revision if possible. Avoid sharing private information.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Safari version, macOS version, Wikipaidia version and loading method
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or other details
+      description: Attach a screenshot if it helps explain the problem.

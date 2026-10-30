@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Wikipaidia",
+  "short_name": "Wikipaidia",
+  "version": "0.9.1",
+  "description": "Shows disclosed paid involvement on English Wikipedia.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://en.wikipedia.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Wikipaidia: show article disclosures"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://en.wikipedia.org/wiki/*",
+        "https://en.wikipedia.org/w/index.php*"
+      ],
+      "js": [
+        "diff-model.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}

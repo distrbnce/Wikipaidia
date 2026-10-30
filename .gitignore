@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+test-results/
+# Regenerated from extension/ by scripts/build-safari.sh.
+safari/Wikipaidia/
+.cache/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.xcuserstate
+xcuserdata/
