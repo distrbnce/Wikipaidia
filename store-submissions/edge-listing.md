@@ -5,9 +5,9 @@ Prepared October 30, 2026 for the completed **0.11.0** source. Source checks,
 installed-extension checks passed. Microsoft Edge was not installed locally;
 these checks do not establish that Edge-specific review has been completed.
 
-Verified package: `dist/Wikipaidia-Edge-0.11.0.zip`, 154,375 bytes, 13 files
+Verified package: `dist/Wikipaidia-Edge-0.11.0.zip`, 155,037 bytes, 13 files
 including `LICENSE`.
-SHA-256: `4a8feab06cb1ac7c4b2a90b4c59ad3f7433ccff6d6d6be68b434e800e0586e5f`.
+SHA-256: `65368279101ee53579d634a96e9890653f7c7c2cfe7e585a576b4a3af73d46e5`.
 Publisher registration and store certification remain separate steps.
 
 ## Listing fields

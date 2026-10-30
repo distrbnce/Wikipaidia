@@ -11,6 +11,10 @@ The `chromium/` and `webkit/` folders each contain three **1280×800 opaque RGB 
 - `02-evidence-and-edits.png`: the actual evidence panel and inline edit comparisons.
 - `03-page-tint.png`: the actual page-tint preference applied to the article.
 
+The evidence-panel images use its normal scroll position at the bottom so the
+complete Wikipedia license/attribution note is visible. The interface layout and
+controls are unchanged.
+
 These screenshots render the current extension source with **visibly identified,
 fictional example data**, using isolated Playwright browser contexts. They show the
 actual interface, not a redrawn mockup. The capture does not contact Wikipedia or

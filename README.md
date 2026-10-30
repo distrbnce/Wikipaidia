@@ -249,5 +249,9 @@ executing wikitext. Results carry their exact source links into the panel.
 - [Google: Load an unpacked extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
 - [Microsoft: Sideload an extension](https://learn.microsoft.com/en-us/microsoft-edge/extensions/getting-started/extension-sideloading)
 
-Code is available under the MIT license. Wikipedia source text remains under its
-applicable license; evidence links provide source and contributor attribution.
+Code is available under the MIT license. Wikipedia text is generally available
+under [CC BY-SA 4.0](https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License);
+sources may identify exceptions or additional attribution requirements. The panel
+links to the license and exact sources for authors and revision history. Excerpts
+and edit previews may be shortened or reformatted; their applicable licenses
+continue to apply.

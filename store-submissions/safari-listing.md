@@ -8,9 +8,33 @@ Safari/WebKit behavior and the macOS containing app.
 This submission targets **Safari on macOS only**. It does not claim iPhone, iPad
 or visionOS support. Use `dist/Wikipaidia-Safari-0.11.0.zip` with Apple's web
 packager, or create a store-signed build from the same completed release source.
-The verified ZIP is 154,375 bytes and contains 13 files including `LICENSE`.
-SHA-256: `4a8feab06cb1ac7c4b2a90b4c59ad3f7433ccff6d6d6be68b434e800e0586e5f`.
-App Store Connect packaging, signing and review remain separate steps.
+The verified ZIP is 155,037 bytes and contains 13 files including `LICENSE`.
+SHA-256: `65368279101ee53579d634a96e9890653f7c7c2cfe7e585a576b4a3af73d46e5`.
+The ZIP has been uploaded to Apple's packager and associated with Wikipaidia.
+Build **0.11.0 (1)** failed while exporting for App Store distribution. Apple's
+issues page asks for a logs artifact but exposes no download control. The export
+failure's cause remains unknown; the unsupported-manifest-key warning is not a
+confirmed cause. The app has not been submitted for review.
+
+## Current App Store Connect status
+
+- macOS app record: [Wikipaidia, app ID 6829067688](https://appstoreconnect.apple.com/apps/6829067688/distribution).
+- Registered bundle ID: `com.michaeljasonhoward.Wikipaidia`.
+- Registered SKU: `wikipaidia-macos`.
+- Safari ZIP uploaded and associated with Wikipaidia; build **0.11.0 (1)** failed
+  during App Store export. The refreshed candidate with the content-license
+  notice is uploaded as **0.11.0 (2)** and is being packaged. No signed build is
+  ready for review.
+- A local Release archive compiled for Intel and Apple silicon, with a macOS
+  13.0 deployment target and the registered identifiers. It still needs
+  distribution signing, upload and native runtime testing.
+- Three labeled WebKit fixture screenshots have been uploaded to the listing.
+  These are demonstration captures, not native Safari screenshots.
+- A private App Review contact phone number is required before the metadata can
+  be saved. Awaiting the user's number; it must not be written into public files.
+- The privacy policy URL is saved. Publishing the draft privacy label and
+  completing the age-rating and content-rights declarations await the publisher's
+  approval.
 
 ## App Store fields
 
@@ -30,11 +54,14 @@ App Store Connect packaging, signing and review remain separate steps.
 | Privacy policy URL | https://github.com/distrbnce/Wikipaidia/blob/main/PRIVACY.md — verify the finalized policy is public before submission |
 | Copyright | 2026 Wikipaidia contributors; consistent with the published MIT license |
 | Review contact name | Michael Howard |
-| Review contact phone | Provided in publisher account |
+| Review contact phone | Awaiting user-provided private reviewer number; required before metadata saves |
 | Review contact email | contact@michaeljasonhoward.com, unless the user supplies a separate review contact |
 | Sign-in required | No |
-| Bundle ID / SKU | Choose or verify in the publisher account; do not invent an existing registered identifier |
-| Minimum macOS version | Confirm from the actual packaged build; no minimum is claimed in this draft |
+| Bundle ID | com.michaeljasonhoward.Wikipaidia |
+| SKU | wikipaidia-macos |
+| App Store Connect app ID | 6829067688 |
+| App Store Connect URL | https://appstoreconnect.apple.com/apps/6829067688/distribution |
+| Minimum macOS version | Local fallback archive targets macOS 13.0; confirm the cloud-generated build separately and complete native runtime testing |
 
 Apple allows up to 30 characters each for name and subtitle; these values use
 10 and 27. [App information limits](https://developer.apple.com/help/app-store-connect/reference/app-information/app-information/)
@@ -88,24 +115,28 @@ summary verified against that earlier store build and the completed 0.11 build.
 
 ## Safari ZIP packaging path
 
-The user already has an Apple Developer account. Verify the correct team and
-active Apple Developer Program membership, then use the following documented
-path:
+The user has an Apple Developer account and the macOS app record above has been
+created. The route observed in this account is **global Xcode Cloud → More →
+Safari Web Extension Packager**, in the team's **Users and Access / Xcode Cloud**
+area. Do not rely on the packager being inside the app record's Xcode Cloud tab.
 
-1. Open **App Store Connect → Apps** and create or select the Wikipaidia app
-   record. Select **macOS** only. Confirm the name, registered bundle ID, SKU and
-   team in the account.
-2. Open the app's **Xcode Cloud** tab. Under **Safari Web Extension Packager**,
-   click **Upload**.
-3. Upload the completed, verified 0.11 Safari ZIP containing `manifest.json` and all
-   extension resources. This ZIP contains extension source, not the repository's
-   unsigned Debug app.
-4. Check packaging status and reported compatibility issues under **Builds**.
-   Test the resulting macOS app and extension through TestFlight before choosing
-   the build for review.
-5. Complete metadata, privacy information, screenshots and review notes. Confirm
-   the build/version and submit the appropriate macOS build for App Review using
-   the release settings approved in the publisher account.
+1. Select the existing macOS [Wikipaidia app record](https://appstoreconnect.apple.com/apps/6829067688/distribution).
+   Its bundle ID is `com.michaeljasonhoward.Wikipaidia` and SKU is
+   `wikipaidia-macos`.
+2. Open **global Xcode Cloud → More → Safari Web Extension Packager** and upload
+   the verified Safari ZIP. This upload and association with Wikipaidia have
+   already been completed. The ZIP contains extension source, not the
+   repository's unsigned Debug app.
+3. Wait for the current processing operation and inspect its result. No successful
+   build is confirmed yet. Check the resulting packaging status and any reported
+   compatibility issues, then test an available macOS build through TestFlight
+   before choosing it for review.
+4. Complete metadata, privacy information, screenshots and review notes. Three
+   labeled WebKit fixture screenshots are uploaded. Metadata saving is currently
+   waiting for the user's private reviewer phone number.
+5. After a successful build and completed metadata are confirmed, select the
+   appropriate macOS build and submit it for App Review using the approved
+   release settings. This submission has not happened yet.
 
 Apple's web packager handles app packaging; no claim is made that the existing
 unsigned local app is store ready. If the account does not show the packager,

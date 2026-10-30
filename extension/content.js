@@ -124,6 +124,8 @@
     .action:hover { background:#f8f9fa; }
     .action:disabled { opacity:.5; cursor:wait; }
     .warning { color:#785310; font-size:11px; margin-top:8px; }
+    .attribution { margin-top:14px; padding-top:9px; border-top:1px solid #eaecf0; color:#72777d; font-size:10px; line-height:1.55; }
+    .attribution .source { font-size:inherit; }
     .preference-error { color:#785310; font-size:11px; padding:7px 16px 0; }
     @media(max-width:480px) { .panel { right:12px; top:12px; width:calc(100vw - 24px); height:calc(100dvh - 24px); } }
     @media print { .panel,.page-tint { display:none !important; } }
@@ -779,7 +781,12 @@
   actions.append(moreButton, refreshButton);
   const sourceError = el("p", "warning");
   sourceError.setAttribute("role", "status");
-  scroll.append(articleTitle, statusBox, historical, cards, actions, sourceError);
+  const attribution = el("p", "attribution");
+  attribution.hidden = true;
+  attribution.append("Wikipedia text is generally available under ",
+    sourceLink("CC BY-SA 4.0", "https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License"),
+    ". See sources for authors, history, and exceptions. Excerpts and edit previews may be shortened or reformatted.");
+  scroll.append(articleTitle, statusBox, historical, cards, actions, sourceError, attribution);
 
   function evidenceKey(item) {
     return item.id || `${item.kind}:${item.sourceTitle}:${item.sourceRevision}:${item.contributor || ""}:${item.coiType || ""}`;
@@ -832,6 +839,7 @@
       refreshButton.textContent = error ? "Retry" : loading ? "Refreshing…" : "Refresh";
       sourceError.textContent = augmentationError;
       sourceError.hidden = !augmentationError;
+      attribution.hidden = evidence.length === 0;
     });
     startAutomaticEdits();
   }

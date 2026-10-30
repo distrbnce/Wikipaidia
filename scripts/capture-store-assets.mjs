@@ -157,6 +157,15 @@ for (const engine of engines) {
     await page.locator(".launcher").click();
     await page.locator(".change-unified").nth(2).waitFor({state:"visible"});
     await page.getByRole("button",{name:"Close",exact:true}).blur();
+    // Show the complete source-license notice by using the panel's normal scroll
+    // position, without changing its actual layout or hiding any controls.
+    await page.locator(".scroll").evaluate(node => {node.scrollTop=node.scrollHeight;});
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const attribution = await page.locator(".attribution").boundingBox();
+    const scrollBounds = await page.locator(".scroll").boundingBox();
+    assert.ok(attribution && scrollBounds && attribution.y >= scrollBounds.y &&
+      attribution.y+attribution.height <= scrollBounds.y+scrollBounds.height,
+    "The complete attribution note should be readable in the panel viewport.");
     await capture("02-evidence-and-edits.png");
     await page.getByRole("combobox",{name:"Alert style",exact:true}).selectOption("tint");
     await page.locator(".page-tint").waitFor({state:"visible"});
@@ -167,7 +176,7 @@ for (const engine of engines) {
     assert.deepEqual(errors, []);
     await writeFile(path.join(folder, "capture.json"), JSON.stringify({
       extensionVersion:manifest.version,renderingEngine:engine,browserVersion:browser.version(),
-      viewport:{width:1280,height:800},fictionalExampleData:true,requestsToWikipedia:false,
+      viewport:{width:1280,height:800},fictionalExampleData:true,requestsToWikipedia:false,panelScrolledToFooter:true,
       sourceSHA256:Object.fromEntries(scriptNames.map((name,index)=>[name,createHash("sha256").update(scripts[index]).digest("hex")])),
       screenshots:["01-banner.png","02-evidence-and-edits.png","03-page-tint.png"]
     }, null, 2)+"\n");
