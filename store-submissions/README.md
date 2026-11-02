@@ -58,8 +58,8 @@ has been created with app ID **6829067688**, registered bundle ID
 `com.michaeljasonhoward.Wikipaidia` and SKU `wikipaidia-macos`.
 
 The signed native release candidate **0.11.0 (3)** was uploaded successfully on
-November 2, 2026. Apple processed and validated it and marks it **Ready to Submit**
-in TestFlight; App Store build selection remains pending. It was
+November 2, 2026. Apple processed and validated it, and the build was selected and
+saved for the App Store version. It was
 archived with **Xcode 27.2 RC (27B48)** for Apple silicon and Intel. Both native
 targets require **macOS 13.3**; code signatures and all 13 packaged resource files
 were verified. The app and extension declare
@@ -76,14 +76,10 @@ underlying cause is unknown, and the manifest warning alone does not establish i
 The privacy label was published on November 2. Content rights are saved as
 **Yes**; the approved age-rating answers are saved with a computed **13+** rating
 and the default, without an override. Three labeled WebKit fixture screenshots
-are uploaded. Review contact fields are filled, but saving the version metadata
-still requires the user's private reviewer phone number. Keep that number out of
-public files. Apple's Apps page also requires the account holder to accept the
-updated Paid Applications Schedule before new-app submission; that separate
-agreement is open for review. The version page currently shows no build-selection
-control despite the processed build, so selection must be rechecked. Complete the
-remaining metadata and select the native build before submitting for review.
-**No App Review submission has been made.**
+are uploaded. Review contact information is saved privately, and the Paid Apps
+Agreement is **Active**. Version **0.11.0, build 3** was submitted to App Review on
+**November 2, 2026 at 3:01 PM America/Chicago** and is **Waiting for Review**.
+Automatic release after approval is selected. Store approval remains pending.
 
 Use the current publisher forms' definitions when completing privacy disclosures.
 The listing files include the actual network and local-storage behavior to support

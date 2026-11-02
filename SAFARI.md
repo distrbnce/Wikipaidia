@@ -100,10 +100,11 @@ The helper generates a development project. Before archiving for the store:
 
 The **0.11.0 (3)** release candidate was archived with **Xcode 27.2 RC (27B48)**,
 with the settings and resource/signature checks above, and uploaded successfully
-on November 2, 2026. Apple processed and validated the build, which is marked
-**Ready to Submit** in TestFlight. App Store build selection remains pending. This
-does not establish runtime testing on every supported Mac or OS, and no App
-Review submission has been made. Current listing status is in the
+on November 2, 2026. Apple processed and validated the build. It was selected and
+saved for the App Store version and submitted at **3:01 PM America/Chicago** that
+day; its status is **Waiting for Review**, with automatic release after approval
+selected. Archive checks do not establish runtime testing on every supported Mac
+or OS. Current listing status is in the
 [Safari submission notes](store-submissions/safari-listing.md).
 
 Apple documentation:

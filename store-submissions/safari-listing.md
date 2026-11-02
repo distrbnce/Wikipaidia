@@ -11,18 +11,17 @@ packager, or create a store-signed build from the same completed release source.
 The verified ZIP is 155,037 bytes and contains 13 files including `LICENSE`.
 SHA-256: `65368279101ee53579d634a96e9890653f7c7c2cfe7e585a576b4a3af73d46e5`.
 The current store candidate is the signed native **0.11.0 (3)** archive, uploaded
-successfully on November 2. Apple processed and validated it; TestFlight marks it
-**Ready to Submit**. App Store build selection remains pending.
-The app has not been submitted for review.
+successfully on November 2. Apple processed and validated it, and the build was
+selected and saved for the App Store version. It was submitted to App Review on
+**November 2, 2026 at 3:01 PM America/Chicago** and is **Waiting for Review**.
 
 ## Current App Store Connect status
 
 - macOS app record: [Wikipaidia, app ID 6829067688](https://appstoreconnect.apple.com/apps/6829067688/distribution).
 - Registered bundle ID: `com.michaeljasonhoward.Wikipaidia`.
 - Registered SKU: `wikipaidia-macos`.
-- Signed native release candidate **0.11.0 (3)** uploaded successfully and
-  processed. Its binary is validated and TestFlight marks it **Ready to Submit**;
-  App Store build selection remains pending. The universal Release archive
+- Signed native release candidate **0.11.0 (3)** uploaded successfully, processed,
+  validated and selected for the App Store version. The universal Release archive
   was built with **Xcode 27.2 RC (27B48)**. Both native targets require **macOS
   13.3**, and their code signatures and all 13 packaged resource files were
   verified. This does not claim runtime testing on every supported Mac or OS.
@@ -33,18 +32,15 @@ The app has not been submitted for review.
   unknown; the unsupported-manifest-key warning is not a confirmed cause.
 - Three labeled WebKit fixture screenshots have been uploaded to the listing.
   These are demonstration captures, not native Safari screenshots.
-- Review contact fields are filled. Saving version metadata still requires the
-  user's private reviewer phone number; it must not be written into public files.
+- Version metadata and review contact information are saved. Private reviewer
+  contact details must not be written into public files.
 - The privacy policy URL is saved and the privacy label was published November 2.
   Content rights are saved as **Yes**. Approved age-rating answers are saved,
   producing **13+** with the default setting and no override.
-- Apple's Apps page requires the account holder to accept the updated Paid
-  Applications Schedule before new-app submission. The agreement is open for
-  review; it has not been accepted by this workflow.
-- The version page currently lacks the documented build-selection control despite
-  the processed build. Matching version/platform and normal App Store distribution
-  were verified; the cause of the missing control remains unconfirmed.
-- **No App Review submission has been made.**
+- The Paid Apps Agreement is **Active**.
+- **Submitted November 2, 2026 at 3:01 PM America/Chicago; Waiting for Review.**
+  Automatic release after approval is selected. Apple has not yet approved or
+  published this store version.
 
 ## App Store fields
 
@@ -53,7 +49,7 @@ The app has not been submitted for review.
 | Name | Wikipaidia |
 | Subtitle | Wikipedia disclosure reader |
 | Platform | macOS only |
-| Version | 0.11.0, build 3 processed and validated; awaiting App Store selection |
+| Version | 0.11.0, build 3; submitted and Waiting for Review |
 | Primary language | English (United States) |
 | Primary category | Utilities; keep the packaged app category consistent |
 | Publisher/seller display name | Michael Howard; verified in the user's signed-in Apple account |
@@ -64,7 +60,7 @@ The app has not been submitted for review.
 | Privacy policy URL | https://github.com/distrbnce/Wikipaidia/blob/main/PRIVACY.md |
 | Copyright | 2026 Wikipaidia contributors; consistent with the published MIT license |
 | Review contact name | Michael Howard |
-| Review contact phone | Awaiting user-provided private reviewer number; required before metadata saves |
+| Review contact phone | Saved privately in App Store Connect; do not copy into public files |
 | Review contact email | contact@michaeljasonhoward.com, unless the user supplies a separate review contact |
 | Sign-in required | No |
 | Bundle ID | com.michaeljasonhoward.Wikipaidia |
@@ -138,12 +134,14 @@ area. Do not rely on the packager being inside the app record's Xcode Cloud tab.
 2. Inspect any processing issues and test the available native build through
    TestFlight before selecting it for review. Browser fixture checks do not test
    the installed Safari background worker.
-3. Have the account holder review the required Paid Applications Schedule update.
-   Finish version metadata after the user enters the private reviewer phone
-   number. The privacy label, content rights and age-rating answers are already
-   saved; three labeled WebKit fixture screenshots are uploaded.
-4. Select the processed build and submit it for App Review using the approved
-   release settings. This submission has not happened yet.
+3. Complete required agreements and version metadata, keeping reviewer contact
+   information private. For this submission, the Paid Apps Agreement is Active;
+   metadata, privacy label, content rights and age-rating answers are saved, and
+   three labeled WebKit fixture screenshots are uploaded.
+4. Select and save the processed build, click **Add for Review**, then confirm
+   **Submit for Review** in the draft submission. Version **0.11.0 (3)** completed
+   these steps on November 2 and is **Waiting for Review**, with automatic release
+   after approval selected. Monitor App Review for requests or a decision.
 
 Alternatively, upload the verified source ZIP through the web packager and inspect
 its result. It packages the extension into a containing app; the repository's
