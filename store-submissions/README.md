@@ -33,9 +33,10 @@ Both verified packages have SHA-256:
 65368279101ee53579d634a96e9890653f7c7c2cfe7e585a576b4a3af73d46e5
 ```
 
-Rebuild and recheck the hashes after any extension or license change. The native
-unsigned Debug app is a development build; the Safari ZIP goes through Apple's
-packaging and store-review workflow.
+Each verified ZIP is 155,037 bytes. Rebuild and recheck the hashes after any
+extension or license change. Safari store distribution can use Apple's web
+packager or a signed native archive; the development helper's unsigned Debug app
+is separate from the store candidate.
 
 ## Local validation
 
@@ -56,27 +57,33 @@ For Safari, the macOS [Wikipaidia app record](https://appstoreconnect.apple.com/
 has been created with app ID **6829067688**, registered bundle ID
 `com.michaeljasonhoward.Wikipaidia` and SKU `wikipaidia-macos`.
 
-The route observed in this account is **global Xcode Cloud → More → Safari Web
-Extension Packager**, in the team's **Users and Access / Xcode Cloud** area; the
-packager is not necessarily inside the app record's tab. The verified Safari ZIP
-has been uploaded and associated with Wikipaidia. Build **0.11.0 (1)** failed
-while exporting for App Store distribution. Apple's issues page requests a logs
-artifact but exposes no download control; the underlying export failure remains
-unknown. The unsupported-manifest-key warning alone does not establish its cause.
-The refreshed candidate, including the in-panel content-license notice, was
-uploaded as **0.11.0 (2)** and failed with the same export error. A local Release
-archive compiled for Intel and Apple silicon with a macOS 13.0 deployment target; it is
-not signed for distribution and has not been tested on every supported OS.
+The signed native release candidate **0.11.0 (3)** was uploaded successfully on
+November 2, 2026. Apple processed and validated it and marks it **Ready to Submit**
+in TestFlight; App Store build selection remains pending. It was
+archived with **Xcode 27.2 RC (27B48)** for Apple silicon and Intel. Both native
+targets require **macOS 13.3**; code signatures and all 13 packaged resource files
+were verified. The app and extension declare
+`ITSAppUsesNonExemptEncryption=false` for their OS-provided HTTPS. See
+[Safari release preparation](../SAFARI.md#prepare-a-store-archive) for requirements
+and reproduction steps. This does not establish runtime testing on every
+supported Mac or OS.
 
-Three labeled WebKit fixture screenshots have been uploaded to the listing.
-Version-listing metadata cannot yet be saved because App Review requires a
-private reviewer phone number, which is awaiting the user. Keep that number out of public files. Once
-packaging or native signing succeeds, test the resulting macOS build, finish the
-metadata and privacy fields, and then submit it for review. The privacy policy URL
-is saved; publishing the privacy label and completing the age-rating and content
-rights declarations await publisher approval. **No App Review submission has been
-made.**
+The web packager remains an alternative route at **global Xcode Cloud → More →
+Safari Web Extension Packager**. Its two earlier export attempts failed; the
+underlying cause is unknown, and the manifest warning alone does not establish it.
 [Apple's packaging guide](https://developer.apple.com/documentation/safariservices/packaging-and-distributing-safari-web-extensions-with-app-store-connect)
+
+The privacy label was published on November 2. Content rights are saved as
+**Yes**; the approved age-rating answers are saved with a computed **13+** rating
+and the default, without an override. Three labeled WebKit fixture screenshots
+are uploaded. Review contact fields are filled, but saving the version metadata
+still requires the user's private reviewer phone number. Keep that number out of
+public files. Apple's Apps page also requires the account holder to accept the
+updated Paid Applications Schedule before new-app submission; that separate
+agreement is open for review. The version page currently shows no build-selection
+control despite the processed build, so selection must be rechecked. Complete the
+remaining metadata and select the native build before submitting for review.
+**No App Review submission has been made.**
 
 Use the current publisher forms' definitions when completing privacy disclosures.
 The listing files include the actual network and local-storage behavior to support
