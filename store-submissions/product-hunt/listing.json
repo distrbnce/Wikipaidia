@@ -1,0 +1,17 @@
+{
+  "name": "Wikipaidia",
+  "tagline": "See paid-editing disclosures on Wikipedia",
+  "description": "A free, open-source browser extension that surfaces public paid-editing disclosures on English Wikipedia and links to supporting evidence. It reads disclosed relationships; it cannot detect undisclosed payments.",
+  "website": "https://github.com/distrbnce/Wikipaidia",
+  "pricing": "Free",
+  "suggestedTopics": ["Open Source", "Chrome Extensions", "Productivity"],
+  "makerName": "Michael Howard",
+  "makerRole": "I made this",
+  "repository": "https://github.com/distrbnce/Wikipaidia",
+  "support": "https://github.com/distrbnce/Wikipaidia/blob/main/store-submissions/support.md",
+  "privacy": "https://github.com/distrbnce/Wikipaidia/blob/main/PRIVACY.md",
+  "logo": "assets/logo-240.png",
+  "gallery": ["assets/01-evidence-and-edits.png", "assets/02-banner.png", "assets/03-page-tint.png"],
+  "firstComment": "Hi Product Hunt! I’m Michael Howard, the maker of Wikipaidia.\n\nThe project was inspired by Pablo Torre Finds Out, specifically this episode at 27:45: https://youtu.be/SzgQWv71a2E?t=1665. It prompted me to make public paid-editing disclosures easier to find while reading Wikipedia.\n\nWikipaidia adds an alert when it finds a recognized paid-contributor disclosure or paid-content notice on an English Wikipedia article. Open the panel to inspect the named editor and employer, follow the supporting source revision, and compare the contributor’s direct article edits. You can choose a banner or page tint.\n\nThis is a disclosure reader: it cannot detect undisclosed payments, judge whether an article is biased, or prove that every edit by an account was paid. General conflicts of interest and unverified payment concerns remain distinct.\n\nIt’s free and open source, with no publisher backend, account, telemetry or analytics. Requests for public evidence go directly to Wikipedia. Chrome and Edge can be loaded from the GitHub downloads or source; Safari’s macOS App Store submission is awaiting review. The README has installation instructions and example articles, including BP, Vivek Ramaswamy and Subway. Live disclosures can change.\n\nWhat would make the evidence easier to understand? Which disclosure formats should I support next?\n\nWikipaidia is independent and is not affiliated with or endorsed by Wikipedia, the Wikimedia Foundation or Pablo Torre Finds Out.",
+  "launchState": "prepare a draft; do not schedule until availability and installation links are rechecked"
+}

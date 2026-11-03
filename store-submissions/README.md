@@ -7,6 +7,7 @@ Prepared for desktop version **0.11.0**, with **Michael Howard** as publisher an
 
 - [Microsoft Edge listing and certification notes](edge-listing.md)
 - [Safari for macOS listing and review notes](safari-listing.md)
+- [Product Hunt launch copy and media](product-hunt.md)
 - [Public support page](support.md)
 - [Public privacy policy](../PRIVACY.md)
 - [Screenshots, icons, and capture details](assets/README.md)

@@ -1,0 +1,47 @@
+{
+  "extensionVersion": "0.11.0",
+  "fictionalExampleData": true,
+  "formattingBrowser": {
+    "channel": "chrome",
+    "version": "156.0.8078.80"
+  },
+  "transform": "Existing assets scaled proportionally and centered; no screenshot content cropped or retouched.",
+  "assets": [
+    {
+      "file": "logo-240.png",
+      "width": 240,
+      "height": 240,
+      "bytes": 9459,
+      "source": "store-submissions/assets/safari-app-icon-1024.png",
+      "sourceSHA256": "4146d585effa16e14f0e1fe765e89b57489e29067941d25a8d0ffbba4ccc801b",
+      "sha256": "23cac344e3ddc649e00f9f3a466708b630d2228c587ea752da5f10779324d501"
+    },
+    {
+      "file": "01-evidence-and-edits.png",
+      "width": 1270,
+      "height": 760,
+      "bytes": 251888,
+      "source": "store-submissions/assets/chromium/02-evidence-and-edits.png",
+      "sourceSHA256": "a2ce184d86ce4820092611d7267f0e611e06c679c86ff8ed12a696af22a31d40",
+      "sha256": "43d63b4257cdd91c9ee8a93a40c2a14a08d2a19a6c746240867caab39c07f4d0"
+    },
+    {
+      "file": "02-banner.png",
+      "width": 1270,
+      "height": 760,
+      "bytes": 183055,
+      "source": "store-submissions/assets/chromium/01-banner.png",
+      "sourceSHA256": "eb3e5f8f76bdbc75bede967d2c929679dd1f98c369c6093d3403c269db8f603a",
+      "sha256": "ffe210ab8418aac39571b2d9049724539355145b32cdcb986d6ef0e62f531958"
+    },
+    {
+      "file": "03-page-tint.png",
+      "width": 1270,
+      "height": 760,
+      "bytes": 249616,
+      "source": "store-submissions/assets/chromium/03-page-tint.png",
+      "sourceSHA256": "0274652f0f99574256668bdd3c7b038e5c66ab7dec8f3765ce0a763841aafb47",
+      "sha256": "b299f59c8d8e31fd17a3b0c19a2d7291a95d96975ac48ce312faec3ab7df1f1c"
+    }
+  ]
+}
